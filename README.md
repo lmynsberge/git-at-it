@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-Give examples
+If you download Maven with the link below, it should take care of any dependencies you need.
 ```
 
 ### Installing
@@ -20,36 +20,14 @@ A step by step series of examples that tell you have to get a development env ru
 Say what the step will be
 
 ```
-Give the example
-```
+The project uses Maven, so the only required process is to switch to the source directory (where the pom.xml is located) and run maven. See the Maven link below for more information. 
 
-And repeat
-
+The POM should be setup to use the Main() method in RequestRunner.java for easier testing, but realistically this would probably exist as a web service called from a batch or other service.
 ```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
+The project uses standard JUnit unit tests with some reliance on the Mockito framework. You can just run these from your favorite IDE.
 
 ## Deployment
 
