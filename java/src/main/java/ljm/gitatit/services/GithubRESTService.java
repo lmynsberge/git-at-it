@@ -63,6 +63,9 @@ public class GithubRESTService implements IRepoService {
 	private void MakeDataCall(String path) {
 		// Create web client and add the path sent
 		Client client = ClientBuilder.newClient();
+		
+		// Would typically use OAuth and hide all of this, but for now just use no authentication or allow individual users
+		//  to add their own information.
 		if(!s_Password.isEmpty()) {
 			HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic(s_Username, s_Password);
 			 
