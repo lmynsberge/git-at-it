@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import ljm.gitatit.external.github.PullRequest;
+import ljm.gitatit.external.github.State;
 
 /**
  * The main Github REST Service for pull requests
@@ -24,6 +25,7 @@ public class GithubRESTService implements IRepoService {
 	private String _organization;
 	private String _repository;
 	private ILogger _logger;
+	private State _repoState;
 	
 	public GithubRESTService() {
 		this._pullRequestResults = new ArrayList<ljm.gitatit.data.PullRequest>();
@@ -57,6 +59,9 @@ public class GithubRESTService implements IRepoService {
 		Client client = ClientBuilder.newClient();
 		
 		WebTarget wt = client.target(path);
+		if(getRepoState() != State.open) {
+			wt = wt.queryParam("state", getRepoState().toString());
+		}
 		
 		// Make the request and check the response
 		Response response = wt.request(MediaType.APPLICATION_JSON_TYPE).get();
@@ -141,5 +146,13 @@ public class GithubRESTService implements IRepoService {
 	@Override
 	public ILogger getLogger() {
 		return this._logger;
+	}
+
+	public State getRepoState() {
+		return _repoState;
+	}
+
+	public void setRepoState(State repoState) {
+		_repoState = repoState;
 	}
 }

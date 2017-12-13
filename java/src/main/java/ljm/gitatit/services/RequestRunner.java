@@ -1,6 +1,7 @@
 package ljm.gitatit.services;
 
 import ljm.gitatit.data.MemPullRequestRepository;
+import ljm.gitatit.external.github.State;
 
 public class RequestRunner {
 	public static void main(String[] args) throws Exception {
@@ -25,5 +26,18 @@ public class RequestRunner {
 		RepositoryServicesFactory.GetPullRequestData(inMemoryPulls, ghService);
 		
 		// Perform any mutations/analyses below
+		System.out.println(ghService.GetResponse().size());
+		
+		// Make another request to find all repos (since we haven't created a new service, we keep adding)
+		RepositoryServicesFactory.MakePullRequest(ghService, "ramda", "ramda", memoryLogger, State.closed);
+		
+		// Exit early if there were errors
+		if(!memoryLogger.GetLoggedErrors().isEmpty()) {
+			for(String error : memoryLogger.GetLoggedErrors()) {
+				System.out.println(error);
+			}
+			return;
+		}
+		System.out.println(ghService.GetResponse().size());
 	}
 }

@@ -1,6 +1,7 @@
 package ljm.gitatit.services;
 
 import ljm.gitatit.data.IPullRequestRepository;
+import ljm.gitatit.external.github.State;
 
 /**
  * 
@@ -32,13 +33,18 @@ public class RepositoryServicesFactory {
 	 * @param organization The organization to request or
 	 * @param repository The repository to request for
 	 */
-	public static void MakePullRequest(IRepoService service, String organization, String repository, ILogger logger) {
+public static void MakePullRequest(IRepoService service, String organization, String repository, ILogger logger) {
+		
+		MakePullRequest(service, organization, repository, logger, State.open);
+	}
+	public static void MakePullRequest(IRepoService service, String organization, String repository, ILogger logger, State state) {
 		
 		if (service.getClass() == GithubRESTService.class) {
 			GithubRESTService githubService = (GithubRESTService)service;
 			githubService.setLogger(logger);
 			githubService.setOrganization(organization);
 			githubService.setRepository(repository);
+			githubService.setRepoState(state);
 			githubService.MakeRequest(null);
 			return;
 		}
