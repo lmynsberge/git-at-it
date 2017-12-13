@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 import ljm.gitatit.external.github.PullRequest;
 import ljm.gitatit.external.github.State;
@@ -21,11 +24,14 @@ import ljm.gitatit.external.github.State;
 public class GithubRESTService implements IRepoService {
 
 	private static String s_GithubAPIBase = "https://api.github.com/";
+	private static String s_Username = "lmynsberge";
+	private static String s_Password = "";
 	private ArrayList<ljm.gitatit.data.PullRequest> _pullRequestResults;
 	private String _organization;
 	private String _repository;
 	private ILogger _logger;
 	private State _repoState;
+	private int _count;
 	
 	public GithubRESTService() {
 		this._pullRequestResults = new ArrayList<ljm.gitatit.data.PullRequest>();
@@ -57,6 +63,12 @@ public class GithubRESTService implements IRepoService {
 	private void MakeDataCall(String path) {
 		// Create web client and add the path sent
 		Client client = ClientBuilder.newClient();
+		if(!s_Password.isEmpty()) {
+			HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic(s_Username, s_Password);
+			 
+			client.register(feature);
+		}
+		
 		
 		WebTarget wt = client.target(path);
 		if(getRepoState() != State.open) {
@@ -67,17 +79,17 @@ public class GithubRESTService implements IRepoService {
 		Response response = wt.request(MediaType.APPLICATION_JSON_TYPE).get();
 		
 		if(response.getStatus() != 200) {
-			// Use an error logger here
+			this.getLogger().LogError(response.readEntity(String.class));
 			return;
 		}
 		
 		PullRequest[] pullRequests = null;
 		// Catch any cast errors with changes to the data model, but unlikely since it's transitioning to GraphQL.
 		try {
-			pullRequests = response.readEntity(PullRequest[].class);
+				pullRequests = response.readEntity(PullRequest[].class);
 		}
 		catch (Exception e) {
-			// Use an error logger here
+			this.getLogger().LogError(e.getStackTrace().toString());
 			return;
 		}
 		
@@ -108,7 +120,8 @@ public class GithubRESTService implements IRepoService {
 	 * @return A URI string for where to fetch data
 	 */
 	private String GetRepoURI() {
-		return GithubRESTService.s_GithubAPIBase + "repos/" + getOrganization() + "/" + getRepository() + "/pulls";
+		return GithubRESTService.s_GithubAPIBase + "repos/" + getOrganization() + "/" + getRepository() + "/pulls" + "?state=" 
+				+ getRepoState().toString() + "&per_page=100";
 	}
 
 	/*
